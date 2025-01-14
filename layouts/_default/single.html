@@ -14,9 +14,9 @@
       </span>
       {{- end }}
     </h1>
-    {{- if .Description | markdownify }}
+    {{- if .Description }}
     <div class="post-description">
-      {{ .Description }}
+      {{ .Description | markdownify }}
     </div>
     {{- end }}
     {{- if not (.Param "hideMeta") }}
