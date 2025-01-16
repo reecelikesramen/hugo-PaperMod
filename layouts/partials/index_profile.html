@@ -23,11 +23,11 @@
         {{- $img = $img.Process "resize 150x150 webp q80" }}
         {{- end }}
         {{- end }}
-        <img decoding="async" draggable="false" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "profile image" }}"
+        <img decoding="async" draggable="false" loading="eager" fetchpriority="high" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "profile image" }}"
             title="{{ .imageTitle }}" height="{{ .imageHeight | default 150 }}"
             width="{{ .imageWidth | default 150 }}" />
         {{- else }}
-        <img decoding="async" draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "profile image" }}"
+        <img decoding="async" draggable="false" loading="eager" fetchpriority="high" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "profile image" }}"
             title="{{ .imageTitle }}" height="{{ .imageHeight | default 150 }}"
             width="{{ .imageWidth | default 150 }}" />
         {{- end }}
