@@ -34,7 +34,8 @@
         {{- end }}
         {{- end }}
         <h1>{{ .title | default site.Title | markdownify }}</h1>
-        {{- if .email }}<span style="font-style: italic">{{ .email | markdownify }}</span>{{ end }}
+        {{- if .email }}<span>{{ partial "copy_text.html" (dict "content" .email) }}</span>{{
+        end }}
         <span>{{ .subtitle | markdownify }}</span>
         {{- partial "social_icons.html" -}}
 

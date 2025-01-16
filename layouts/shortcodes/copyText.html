@@ -1,0 +1,5 @@
+{{- $content := .Get 0 }}
+{{- if eq $content "" }}
+{{ $content = .Inner }}
+{{- end }}
+{{ partial "copy_text.html" (dict "content" $content) }}
