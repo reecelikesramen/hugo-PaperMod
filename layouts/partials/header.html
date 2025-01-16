@@ -60,7 +60,6 @@
                 {{- $img = $img.Resize "x30" }}
                 {{- end }}
                 {{- end }}
-                {{ $img = $img.Filter "jpg" }}
                 <img src="{{ $img.Permalink }}" alt="" aria-label="logo"
                     height="{{- site.Params.label.iconHeight | default " 30" -}}">
                 {{- else }}
