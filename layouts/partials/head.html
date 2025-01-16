@@ -127,6 +127,22 @@ resources.Minify }}
 <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}">
 {{ end -}}
 
+{{- /* Profile Icon Preload */}}
+<!--
+    Preload largest contentful paint (LCP) image.
+    See https://web.dev/optimize-lcp/ for more information.
+-->
+{{- with site.Params.profile }}
+{{- if and .enabled .imageUrl }}
+{{- if not (urls.Parse .imageUrl).IsAbs }}
+{{- $img := resources.Get .imageUrl }}
+<link rel="preload" as="image" href="{{ $img.Permalink }}">
+{{- else}}
+<link rel="preload" as="image" href="{{ .imageUrl | absURL }}">
+{{- end}}
+{{- end}}
+{{- end}}
+
 <noscript>
     <style>
         #theme-toggle,
