@@ -10,7 +10,7 @@
         {{- $width := .imageWidth | default 150 }}
         {{- $height := .imageHeight | default 150 }}
         {{- if $img }}
-          {{ partial "responsive_image.html" (dict "alt" $alt "title" .imageTitle "soloImage" true "image" $img "width" .imageWidth "height" .imageHeight) }}
+          {{ partial "responsive_image.html" (dict "alt" $alt "title" .imageTitle "soloImage" true "image" $img "width" .imageWidth "height" .imageHeight "quality" 80) }}
         {{- else }}
           <img
             decoding="sync"

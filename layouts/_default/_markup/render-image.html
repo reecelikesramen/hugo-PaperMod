@@ -27,7 +27,7 @@
   {{- $img = (or $pageBundle $globalResources) }}
 {{- end }}
 {{- if $img }}
-  {{ partial "responsive_image.html" (dict "alt" .Text "image" $img) }}
+  {{ partial "responsive_image.html" (dict "alt" .Text "image" $img "quality" 80) }}
 {{- else }}
   <img
     {{- range $k, $v := $attributes -}}

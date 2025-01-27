@@ -10,11 +10,11 @@
     {{- if $cover -}}{{/* i.e it is present in page bundle */}}
     {{- if $addLink }}<a href="{{ (path.Join .RelPermalink .Params.cover.image) | absURL }}" target="_blank"
         rel="noopener noreferrer">{{ end -}}
-        {{ partial "responsive_image.html" (dict "alt" $alt "soloImage" $.IsSingle "image" $cover) }}
+        {{ partial "responsive_image.html" (dict "alt" $alt "soloImage" $.IsSingle "image" $cover "width" 670 "quality" 80) }}
     {{- else }}{{/* For absolute urls and external links, no img processing here */}}
         {{- if $addLink }}<a href="{{ (.Params.cover.image) | absURL }}" target="_blank" rel="noopener noreferrer">{{
             end -}}
-            <img decoding="async" loading="{{$loading}}" src="{{ (.Params.cover.image) | absURL }}" alt="{{ $alt }}">
+            <img decoding="async" loading="{{$loading}}" src="{{ (.Params.cover.image) | absURL }}" alt="{{ $alt }}" width=670>
             {{- end }}
             {{- if $addLink }}</a>{{ end -}}
         {{/* Display Caption */}}
