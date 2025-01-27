@@ -13,10 +13,28 @@
   {{- end -}}
 {{- end -}}
 {{- $attributes := merge .Attributes (dict "alt" .Text "src" $src "title" (.Title | transform.HTMLEscape) "loading" "lazy") -}}
-<img
+<!-- <img
   {{- range $k, $v := $attributes -}}
-    {{- if $v -}}
-      {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+  {{- if $v -}}
+    {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+  {{- end -}}
+{{- end -}}
+/> -->
+{{- $img := "" }}
+{{- if not (urls.Parse $src).IsAbs }}
+  {{- $pageBundle := (.Page.Resources.ByType "image").GetMatch (printf "*%s*" .Destination) }}
+  {{- $globalResources := (resources.ByType "image").GetMatch (printf "*%s*" .Destination) }}
+  {{- $img = (or $pageBundle $globalResources) }}
+{{- end }}
+{{- if $img }}
+  {{ partial "responsive_image.html" (dict "alt" .Text "image" $img "quality" 80) }}
+{{- else }}
+  <img
+    {{- range $k, $v := $attributes -}}
+      {{- if $v -}}
+        {{- printf " %s=%q" $k $v | safeHTMLAttr -}}
+      {{- end -}}
     {{- end -}}
-  {{- end -}}>
+  />
+{{- end }}
 {{- /**/ -}}
