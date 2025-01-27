@@ -1,0 +1,111 @@
+<!-- **Variables:** "alt", "title", "soloImage", "image", "width", "height", "format", "quality" -->
+
+{{- $soloImage := .soloImage | default false }}
+{{- $responsiveImages := (site.Params.assets.responsiveImages | default true) }}
+{{- $alt := (.alt | plainify) }}
+{{- $quality := (.quality | default 100) }}
+{{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
+{{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") }}
+{{- if hugo.IsExtended }}
+  {{- $processableFormats = $processableFormats | append "webp" }}
+{{- end }}
+
+
+<!-- Priority loading, fetching, and decoding for solo images vs off for many images -->
+{{- $loading := cond .soloImage "eager" "lazy" }}
+{{- $fetchPriority := cond .soloImage "high" "auto" }}
+{{- $decoding := cond .soloImage "sync" "async" }}
+
+{{- if (and (in $processableFormats .image.MediaType.SubType) ($responsiveImages) (eq $prod true)) }}
+  {{/* Dynamic size generation */}}
+  {{- $baseSizes := (slice 320 640 960 1280 1600 1920 2560) }}
+  {{- $baseSizes = $baseSizes | append (cond (isset . "width") (int .width) .image.Width) }}
+  {{- $targetWidth := cond (isset . "width") (int .width) .image.Width }}
+  {{- $hiDPIMultipliers := slice 2 3 }}
+  {{- $sizes := $baseSizes }}
+  {{- range $multiplier := $hiDPIMultipliers }}
+    {{- $sizes := union $sizes (apply $baseSizes "math.Mul" $multiplier ".") | uniq | sort }}
+  {{- end }}
+
+
+  <picture>
+    <!-- Make a source set of WebP always if possible -->
+    {{- if hugo.IsExtended }}
+      {{- $webpSources := slice }}
+      {{- range $size := $sizes }}
+        {{- range $multiplier := $hiDPIMultipliers }}
+          {{- if (and (ge $.image.Width $size) (le $size (mul $targetWidth $multiplier))) }}
+            {{- $resized := $.image.Resize (printf "%dx webp q%d" $size $quality) }}
+            {{- $webpSources = $webpSources | append (printf "%s %dw" $resized.Permalink $size) }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      <source
+        type="image/webp"
+        srcset="{{ delimit $webpSources ", " }}"
+        sizes="{{ if .width }}
+          {{ .width }}px
+        {{ else }}
+          100vw
+        {{ end }}"
+      />
+    {{- end }}
+
+
+    <!-- Make a source set if "format" was set and is in the processable formats -->
+    {{ $format := .format | default "" }}
+    {{- if (in $format (slice "jpg" "jpeg" "png" "tif" "bmp" "gif")) }}
+      {{- $sources := slice }}
+      {{- range $size := $sizes }}
+        {{- range $multiplier := $hiDPIMultipliers }}
+          {{- if (and (ge $.image.Width $size) (le $size (mul $targetWidth $multiplier))) }}
+            {{- $resized := $.image.Resize (printf "%dx %s q%d" $size $format $quality) }}
+            {{- $sources = $sources | append (printf "%s %dw" $resized.Permalink $size) }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      <source
+        type="image/{{ $format }}"
+        srcset="{{ delimit $sources ", " }}"
+        sizes="{{ if .width }}
+          {{ .width }}px
+        {{ else }}
+          100vw
+        {{ end }}"
+      />
+    {{- else if not (eq $format "") }}
+      <!-- warn -->
+      {{- warnf "%s is not a valid format of: jpg, jpeg, png, tif, bmp, gif" $format }}
+    {{- end }}
+
+
+    <!-- Original unprocessed source as fallback -->
+    <img
+      src="{{ .image.Permalink }}"
+      loading="{{ $loading }}"
+      fetchpriority="{{ $fetchPriority }}"
+      decoding="{{ $decoding }}"
+      alt="{{ $alt }}"
+      title="{{ .title }}"
+      {{- if or .width .height }}
+        {{- with .width }}width="{{ . }}"{{ end }}
+        {{- with .height }}height="{{ . }}"{{ end }}
+        sizes="{{ .width }}px"
+      {{- else }}
+        width="{{ .image.Width }}" sizes="100vw"
+      {{- end }}
+    />
+  </picture>
+{{- else }}
+  <img
+    src="{{ .image.Permalink | absURL }}"
+    loading="{{ $loading }}"
+    fetchpriority="{{ $fetchPriority }}"
+    decoding="{{ $decoding }}"
+    alt="{{ $alt }}"
+    title="{{ .title }}"
+    decoding="{{ $decoding }}"
+    {{- with .width }}width="{{ . }}"{{ end }}
+    {{- with .height }}height="{{ . }}"{{ end }}
+  />
+{{- end }}
